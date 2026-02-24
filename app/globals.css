@@ -1,0 +1,44 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --font-playfair: 'Playfair Display', Georgia, serif;
+  --font-inter: 'Inter', system-ui, sans-serif;
+}
+
+body {
+  @apply bg-cream text-noir antialiased;
+}
+
+/* Hide scrollbar, keep scroll */
+.scrollbar-hide {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+/* Shiny metallic gradient text */
+.text-shiny {
+  background: linear-gradient(
+    105deg,
+    #a89f8e 0%,
+    #c7bba8 15%,
+    #e8dfd0 35%,
+    #fff9f0 50%,
+    #e8dfd0 65%,
+    #c7bba8 85%,
+    #a89f8e 100%
+  );
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: shimmer 4s ease-in-out infinite;
+}
+@keyframes shimmer {
+  0%, 100% { background-position: 0% center; }
+  50% { background-position: 100% center; }
+}
