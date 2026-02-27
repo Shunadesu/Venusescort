@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Swiper, SwiperSlide } from 'swiper/react';
@@ -9,6 +9,9 @@ import { HiOutlineChevronLeft, HiOutlineChevronRight } from 'react-icons/hi';
 import { isValidImageUrl } from '@/lib/image';
 import 'swiper/css';
 import 'swiper/css/navigation';
+
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || '/api';
+const UPLOADS_BASE = API_BASE.replace(/\/api\/?$/, '');
 
 const TABS = [
   { slug: 'kink', label: 'KINK' },
@@ -19,6 +22,81 @@ const TABS = [
 function hasDiscipline(muse, slug) {
   const disciplines = muse.disciplines || [];
   return disciplines.some((d) => (typeof d === 'object' ? d.slug : d) === slug);
+}
+
+function MuseSlide({ muse }) {
+  const rawImages = useMemo(() => {
+    const raws = [
+      muse.imageUrl,
+      ...(Array.isArray(muse.gallery) ? muse.gallery : []),
+    ].filter(Boolean);
+    // remove duplicates
+    return Array.from(new Set(raws));
+  }, [muse.imageUrl, muse.gallery]);
+
+  const [index, setIndex] = useState(0);
+
+  // Reset index when muse or gallery length changes
+  useEffect(() => {
+    setIndex(0);
+  }, [muse._id, rawImages.length]);
+
+  // Auto-rotate every 3s when there is more than one image
+  useEffect(() => {
+    if (rawImages.length <= 1) return undefined;
+    const id = setInterval(() => {
+      setIndex((prev) => (prev + 1) % rawImages.length);
+    }, 3000);
+    return () => clearInterval(id);
+  }, [rawImages.length]);
+
+  const currentRaw = rawImages[index] || '';
+  let displaySrc = '';
+  let useNextImage = false;
+
+  if (currentRaw) {
+    if (currentRaw.startsWith('/')) {
+      displaySrc = `${UPLOADS_BASE}${currentRaw}`;
+      useNextImage = false;
+    } else if (isValidImageUrl(currentRaw)) {
+      displaySrc = currentRaw;
+      useNextImage = true;
+    }
+  }
+
+  const hasImage = !!displaySrc;
+
+  return (
+    <Link href={`/muses/${muse.slug}`} className="group block">
+      <div className="aspect-[3/4] relative bg-noir/5 overflow-hidden rounded-sm mb-4 shadow-[0_4px_24px_-4px_rgba(0,0,0,0.08)] group-hover:shadow-[0_12px_40px_-8px_rgba(0,0,0,0.12)] transition-shadow duration-300">
+        {hasImage ? (
+          useNextImage ? (
+            <Image
+              src={displaySrc}
+              alt={muse.name}
+              fill
+              className="object-cover group-hover:scale-105 transition-transform duration-500"
+              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+            />
+          ) : (
+            <img
+              src={displaySrc}
+              alt={muse.name}
+              className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+            />
+          )
+        ) : (
+          <div className="w-full h-full flex items-center justify-center text-cream/40 font-serif text-4xl">
+            {muse.name.charAt(0)}
+          </div>
+        )}
+      </div>
+      <p className="font-serif text-lg tracking-wide text-noir">{muse.name}</p>
+      {muse.title && (
+        <p className="text-sm text-noir/60 tracking-[0.02em] mt-0.5">{muse.title}</p>
+      )}
+    </Link>
+  );
 }
 
 export default function MusesSection({ muses = [], disciplines = [] }) {
@@ -78,25 +156,7 @@ export default function MusesSection({ muses = [], disciplines = [] }) {
             {filteredMuses.length > 0 ? (
               filteredMuses.map((m) => (
                 <SwiperSlide key={m._id}>
-                  <Link href={`/muses/${m.slug}`} className="group block">
-                    <div className="aspect-[3/4] relative bg-noir/5 overflow-hidden rounded-sm mb-4 shadow-[0_4px_24px_-4px_rgba(0,0,0,0.08)] group-hover:shadow-[0_12px_40px_-8px_rgba(0,0,0,0.12)] transition-shadow duration-300">
-                      {m.imageUrl && isValidImageUrl(m.imageUrl) ? (
-                        <Image
-                          src={m.imageUrl}
-                          alt={m.name}
-                          fill
-                          className="object-cover group-hover:scale-105 transition-transform duration-500"
-                          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                        />
-                      ) : (
-                        <div className="w-full h-full flex items-center justify-center text-cream/40 font-serif text-4xl">
-                          {m.name.charAt(0)}
-                        </div>
-                      )}
-                    </div>
-                    <p className="font-serif text-lg tracking-wide text-noir">{m.name}</p>
-                    {m.title && <p className="text-sm text-noir/60 tracking-[0.02em] mt-0.5">{m.title}</p>}
-                  </Link>
+                  <MuseSlide muse={m} />
                 </SwiperSlide>
               ))
             ) : (

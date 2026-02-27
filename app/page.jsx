@@ -3,6 +3,7 @@ import Image from 'next/image';
 import { getSite, getMuses, getDisciplines } from '@/lib/api';
 import { isValidImageUrl } from '@/lib/image';
 import MusesSection from '@/components/MusesSection';
+import ContactSection from '@/components/ContactSection';
 
 const HERO_BG =
   'https://static.wixstatic.com/media/nsplsh_63694f354c3870696e3841~mv2_d_4480_6720_s_4_2.jpg';
@@ -42,10 +43,10 @@ export default async function HomePage() {
           <div className="absolute inset-0 bg-noir/40" />
         </div>
         <div className="relative z-10 w-full max-w-[1600px] mx-auto min-h-screen flex flex-col items-center justify-center">
-          <h1 className="font-serif text-5xl sm:text-7xl md:text-8xl text-cream tracking-tight text-center">
+          <h1 className="font-serif text-5xl sm:text-7xl md:text-8xl  text-shiny text-center">
             {brandName.toUpperCase()}
           </h1>
-          <p className="absolute bottom-8 right-8 text-cream/90 text-sm max-w-xs text-right tracking-wide">
+          <p className="absolute bottom-8 left-8 text-cream/90 text-sm max-w-xs text-left tracking-wide">
             {slogan}
           </p>
         </div>
@@ -118,18 +119,23 @@ export default async function HomePage() {
       {/* Quote + CTA */}
       <section className="py-16 px-4 bg-cream-dark">
         <div className="max-w-[1600px] mx-auto">
-        <div className="max-w-2xl mx-auto text-center">
-          <p className="font-serif text-xl text-noir mb-8">
-            Only those who hold the standard enter the House.
-          </p>
-          <Link
-            href="/manifesto"
-            className="inline-block px-6 py-3 border border-noir text-noir font-medium tracking-widest uppercase hover:bg-noir hover:text-cream transition-colors"
-          >
-            The Manifesto
-          </Link>
+          <div className="max-w-2xl mx-auto text-center">
+            <p className="font-serif text-xl text-noir mb-8">
+              Only those who hold the standard enter the House.
+            </p>
+            <Link
+              href="/manifesto"
+              className="inline-block px-6 py-3 border border-noir text-noir font-medium tracking-widest uppercase hover:bg-noir hover:text-cream transition-colors"
+            >
+              The Manifesto
+            </Link>
+          </div>
         </div>
-        </div>
+      </section>
+
+      {/* Contact — mirroring Contact page behaviour */}
+      <section className="py-16 px-4 bg-noir text-cream border-t border-cream/10">
+        <ContactSection />
       </section>
     </div>
   );

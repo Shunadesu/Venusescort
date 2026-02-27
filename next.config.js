@@ -7,7 +7,7 @@ const nextConfig = {
     ],
   },
   async rewrites() {
-    const backend = 'http://localhost:5000';
+    const backend = 'http://localhost:2802';
     return [
       { source: '/api/:path*', destination: `${backend}/api/:path*` },
       { source: '/uploads/:path*', destination: `${backend}/uploads/:path*` },

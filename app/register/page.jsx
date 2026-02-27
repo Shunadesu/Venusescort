@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 import { HiOutlineLockClosed, HiOutlineMail, HiOutlineUser } from 'react-icons/hi';
 import { useAuthStore } from '@/store/useAuthStore';
 
-const API = typeof window !== 'undefined' ? '/api' : 'http://localhost:5000/api';
+const API = typeof window !== 'undefined' ? '/api' : 'http://localhost:2802/api';
 
 export default function RegisterPage() {
   const [name, setName] = useState('');
