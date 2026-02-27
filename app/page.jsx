@@ -116,18 +116,27 @@ export default async function HomePage() {
       {/* Muses — tabs + Swiper carousel */}
       <MusesSection muses={muses} disciplines={disciplines} />
 
-      {/* Quote + CTA */}
-      <section className="py-16 px-4 bg-cream-dark">
-        <div className="max-w-[1600px] mx-auto">
+      {/* Manifesto — quote + CTA */}
+      <section className="relative py-24 md:py-28 px-4 bg-cream-dark overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-b from-cream/30 via-transparent to-cream/20 pointer-events-none" />
+        <div className="relative max-w-[1600px] mx-auto">
           <div className="max-w-2xl mx-auto text-center">
-            <p className="font-serif text-xl text-noir mb-8">
+            <p className="text-[10px] uppercase tracking-[0.4em] text-noir/50 mb-6">
+              The Manifesto
+            </p>
+            <span className="block w-10 h-px bg-noir/30 mx-auto mb-8" aria-hidden />
+            <p className="font-serif text-2xl sm:text-3xl md:text-4xl text-noir leading-snug mb-10 md:mb-12">
               Only those who hold the standard enter the House.
+            </p>
+            <p className="text-sm text-noir/60 max-w-md mx-auto mb-10">
+              Ten principles. One threshold.
             </p>
             <Link
               href="/manifesto"
-              className="inline-block px-6 py-3 border border-noir text-noir font-medium tracking-widest uppercase hover:bg-noir hover:text-cream transition-colors"
+              className="group inline-flex items-center gap-3 px-8 py-3.5 border-2 border-noir text-noir font-medium text-sm tracking-[0.25em] uppercase hover:bg-noir hover:text-cream transition-all duration-300"
             >
-              The Manifesto
+              Read the Manifesto
+              <span className="text-noir/70 group-hover:text-cream" aria-hidden>→</span>
             </Link>
           </div>
         </div>
