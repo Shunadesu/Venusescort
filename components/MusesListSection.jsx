@@ -65,7 +65,7 @@ export default function MusesListSection({ muses = [] }) {
             ))}
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6 md:gap-8">
             {filteredMuses.map((m) => {
               const rawUrl = m.imageUrl || '';
               const imageSrc = rawUrl.startsWith('/') ? `${UPLOADS_BASE}${rawUrl}` : rawUrl;
@@ -74,37 +74,44 @@ export default function MusesListSection({ muses = [] }) {
 
               return (
                 <Link key={m._id} href={`/muses/${m.slug}`} className="group">
-                  <div className="aspect-[3/4] relative bg-noir/5 overflow-hidden rounded-sm mb-4 shadow-[0_4px_24px_-4px_rgba(0,0,0,0.08)] group-hover:shadow-[0_12px_40px_-8px_rgba(0,0,0,0.12)] transition-shadow duration-300">
+                  <div className="aspect-[4/5] max-h-[240px] sm:max-h-[280px] md:max-h-[320px] relative bg-noir/5 overflow-hidden rounded-sm shadow-[0_4px_24px_-4px_rgba(0,0,0,0.08)] group-hover:shadow-[0_12px_40px_-8px_rgba(0,0,0,0.12)] transition-shadow duration-300">
                     {hasImage ? (
                       <Image
                         src={imageSrc}
                         alt={m.name}
                         fill
                         className="object-cover group-hover:scale-105 transition-transform duration-500"
-                        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                        sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
                       />
                     ) : (
-                      <div className="w-full h-full flex items-center justify-center text-cream/40 font-serif text-3xl">
+                      <div className="w-full h-full flex items-center justify-center text-noir/30 font-serif text-2xl">
                         {m.name.charAt(0)}
                       </div>
                     )}
-                  </div>
-                  <p className="font-serif text-xl tracking-wide text-noir">{m.name}</p>
-                  {m.title && (
-                    <p className="text-sm text-noir/60 tracking-[0.02em] mt-0.5">{m.title}</p>
-                  )}
-                  {m.disciplines?.length > 0 && (
-                    <div className="flex flex-wrap gap-1.5 mt-2">
-                      {m.disciplines.map((d) => (
-                        <span
-                          key={typeof d === 'object' ? d._id : d}
-                          className="text-[10px] uppercase tracking-wider text-noir/50"
-                        >
-                          {typeof d === 'object' ? d.title : ''}
-                        </span>
-                      ))}
+                    {/* Overlay: tên + mô tả nằm trong khung hình */}
+                    <div className="absolute inset-x-0 bottom-0 pt-14 pb-3 px-3 sm:pt-16 sm:pb-4 sm:px-4 bg-gradient-to-t from-noir/85 via-noir/40 to-transparent flex flex-col justify-end rounded-b-sm">
+                      <p className="font-serif text-base sm:text-lg tracking-wide text-white drop-shadow-sm">
+                        {(m.name || '').toUpperCase()}
+                      </p>
+                      {m.title && (
+                        <p className="text-[11px] sm:text-xs text-white/90 tracking-[0.02em] mt-0.5 line-clamp-2">
+                          {m.title}
+                        </p>
+                      )}
+                      {m.disciplines?.length > 0 && (
+                        <div className="flex flex-wrap gap-1 mt-1.5">
+                          {m.disciplines.map((d) => (
+                            <span
+                              key={typeof d === 'object' ? d._id : d}
+                              className="text-[10px] uppercase tracking-wider text-white/80"
+                            >
+                              {typeof d === 'object' ? d.title : ''}
+                            </span>
+                          ))}
+                        </div>
+                      )}
                     </div>
-                  )}
+                  </div>
                 </Link>
               );
             })}

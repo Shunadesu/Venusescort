@@ -68,7 +68,7 @@ function MuseSlide({ muse }) {
 
   return (
     <Link href={`/muses/${muse.slug}`} className="group block">
-      <div className="aspect-[3/4] relative bg-noir/5 overflow-hidden rounded-sm mb-4 shadow-[0_4px_24px_-4px_rgba(0,0,0,0.08)] group-hover:shadow-[0_12px_40px_-8px_rgba(0,0,0,0.12)] transition-shadow duration-300">
+      <div className="aspect-[4/5] max-h-[280px] sm:max-h-[320px] md:max-h-[360px] relative bg-noir/5 overflow-hidden rounded-sm shadow-[0_4px_24px_-4px_rgba(0,0,0,0.08)] group-hover:shadow-[0_12px_40px_-8px_rgba(0,0,0,0.12)] transition-shadow duration-300">
         {hasImage ? (
           useNextImage ? (
             <Image
@@ -90,11 +90,18 @@ function MuseSlide({ muse }) {
             {muse.name.charAt(0)}
           </div>
         )}
+        {/* Overlay: tên + mô tả nằm trong khung hình */}
+        <div className="absolute inset-x-0 bottom-0 pt-16 pb-4 px-4 bg-gradient-to-t from-noir/85 via-noir/40 to-transparent flex flex-col justify-end rounded-b-sm">
+          <p className="font-serif text-lg sm:text-xl tracking-wide text-white drop-shadow-sm">
+            {(muse.name || '').toUpperCase()}
+          </p>
+          {muse.title && (
+            <p className="text-xs sm:text-sm text-white/90 tracking-[0.02em] mt-0.5 line-clamp-2">
+              {muse.title}
+            </p>
+          )}
+        </div>
       </div>
-      <p className="font-serif text-lg tracking-wide text-noir">{muse.name}</p>
-      {muse.title && (
-        <p className="text-sm text-noir/60 tracking-[0.02em] mt-0.5">{muse.title}</p>
-      )}
     </Link>
   );
 }
@@ -141,11 +148,11 @@ export default function MusesSection({ muses = [], disciplines = [] }) {
           <Swiper
             key={activeTab}
             modules={[Navigation]}
-            spaceBetween={24}
-            slidesPerView={1}
+            spaceBetween={16}
+            slidesPerView={2}
             breakpoints={{
-              640: { slidesPerView: 2 },
-              1024: { slidesPerView: 3 },
+              640: { slidesPerView: 3, spaceBetween: 20 },
+              1024: { slidesPerView: 4, spaceBetween: 24 },
             }}
             navigation={{
               prevEl: '.muses-prev',
@@ -161,7 +168,7 @@ export default function MusesSection({ muses = [], disciplines = [] }) {
               ))
             ) : (
               <SwiperSlide>
-                <div className="aspect-[3/4] flex items-center justify-center bg-noir/5 rounded-sm text-noir/50 font-serif">
+                <div className="aspect-[4/5] max-h-[280px] sm:max-h-[320px] md:max-h-[360px] flex items-center justify-center bg-noir/5 rounded-sm text-noir/50 font-serif text-sm">
                   No muses in this discipline yet.
                 </div>
               </SwiperSlide>
