@@ -3,6 +3,7 @@ import './globals.css';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import FloatingConnect from '@/components/FloatingConnect';
+import AgeGate from '@/components/AgeGate';
 import { getSite } from '@/lib/api';
 
 const playfair = Playfair_Display({
@@ -34,10 +35,12 @@ export default async function RootLayout({ children }) {
   return (
     <html lang="en" className={`${playfair.variable} ${inter.variable} scrollbar-hide`}>
       <body className="font-sans overflow-x-hidden">
-        <Navbar />
-        <main>{children}</main>
-        <Footer site={site} />
-        <FloatingConnect site={site} />
+        <AgeGate>
+          <Navbar />
+          <main>{children}</main>
+          <Footer site={site} />
+          <FloatingConnect site={site} />
+        </AgeGate>
       </body>
     </html>
   );
