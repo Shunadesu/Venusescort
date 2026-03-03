@@ -74,7 +74,7 @@ function toDisplayImageUrl(src) {
   return UPLOADS_BASE ? `${UPLOADS_BASE}/${src}` : `/${src}`;
 }
 
-/** Trả về URL ảnh tuyệt đối để dùng cho Open Graph / link preview */
+/** Returns absolute image URL for Open Graph / link preview */
 function toAbsoluteImageUrl(src) {
   const url = toDisplayImageUrl(src);
   if (!url) return null;
@@ -242,7 +242,7 @@ export default async function MuseDetailPage({ params }) {
                 </div>
               )}
 
-              {/* My Perfect Date: ngay dưới preferences, trong luồng nội dung */}
+              {/* My Perfect Date: below preferences, in content flow */}
               <section
                 className="relative w-full min-h-[380px] sm:min-h-[420px] flex items-center justify-center py-12 sm:py-16 px-4 sm:px-6 rounded-sm overflow-hidden -mx-0 sm:-mx-2"
                 style={{
@@ -264,15 +264,14 @@ export default async function MuseDetailPage({ params }) {
                       "
                     </span>
                     <p className="px-6 sm:px-8 py-2">
-                      Mein perfektes Escort-Date ist lustig, voll mit bitte seeehr gutem Sex, du bist ein
-                      gepflegter und attraktiver Gentleman und wir zwei machen uns eine unvergessliche Zeit.
-                      Es ist mir vor allem wichtig, dass sich beide wohlfühlen in der Umgebung und alles
-                      ganz locker ist. Ich bin sehr vielseitig, einerseits sehr selbstbewusst und
-                      aufgeschlossen, kann aber auch ne ganz ruhige süße Maus sein. Ein Kennenlernen in
-                      einer netten Bar oder in einem Restaurant, dazu ein paar Drinks und intime Gespräche
-                      (vielleicht schon ein kleiner Teaser was später erwartet), finde ich super. Am Ende
-                      ist mir wichtig, dass wir beide erfüllt aus dem Date herausgehen. Keep it simple and
-                      spicy!
+                      My perfect escort date is fun, with very good sex, and you are a well-groomed,
+                      attractive gentleman—we make it an unforgettable time together. It matters to me
+                      that we both feel comfortable in the setting and that everything stays relaxed.
+                      I am versatile: confident and open, but I can also be a quiet, sweet companion.
+                      Getting to know each other in a nice bar or restaurant, with a few drinks and
+                      intimate conversation (perhaps a little teaser of what’s to come) is something
+                      I love. In the end, I want us both to leave the date fulfilled. Keep it simple
+                      and spicy!
                     </p>
                   </blockquote>
                 </div>
