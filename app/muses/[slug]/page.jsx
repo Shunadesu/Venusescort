@@ -65,6 +65,7 @@ function parseBio(bio) {
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || '/api';
 const UPLOADS_BASE = API_BASE.replace(/\/api\/?$/, '');
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.venusescort.uk';
 
 function toDisplayImageUrl(src) {
   if (!src || typeof src !== 'string') return '';
@@ -73,16 +74,48 @@ function toDisplayImageUrl(src) {
   return UPLOADS_BASE ? `${UPLOADS_BASE}/${src}` : `/${src}`;
 }
 
+/** Trả về URL ảnh tuyệt đối để dùng cho Open Graph / link preview */
+function toAbsoluteImageUrl(src) {
+  const url = toDisplayImageUrl(src);
+  if (!url) return null;
+  if (url.startsWith('http')) return url;
+  const base = SITE_URL.replace(/\/$/, '');
+  return url.startsWith('/') ? `${base}${url}` : `${base}/${url}`;
+}
+
 export async function generateMetadata({ params }) {
   const muse = await getMuseBySlug(params.slug);
   if (!muse) {
     return { title: 'Muse not found — Venusescort' };
   }
   const baseTitle = muse.name || 'Muse';
+  const title = `${baseTitle} — Venusescort`;
   const desc = muse.intro || muse.bio || muse.title || 'A muse of the House.';
+  const description = typeof desc === 'string' ? desc.slice(0, 160) : 'A muse of the House.';
+  const canonicalUrl = `${SITE_URL.replace(/\/$/, '')}/muses/${muse.slug}`;
+  const imageUrl = toAbsoluteImageUrl(muse.imageUrl) || toAbsoluteImageUrl(muse.gallery?.[0]);
+
   return {
-    title: `${baseTitle} — Venusescort`,
-    description: typeof desc === 'string' ? desc.slice(0, 160) : 'A muse of the House.',
+    title,
+    description,
+    openGraph: {
+      title,
+      description,
+      url: canonicalUrl,
+      siteName: 'Venusescort',
+      type: 'website',
+      ...(imageUrl && {
+        images: [
+          { url: imageUrl, width: 1200, height: 630, alt: `${baseTitle} | Venusescort` },
+        ],
+      }),
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description,
+      ...(imageUrl && { images: [imageUrl] }),
+    },
   };
 }
 
