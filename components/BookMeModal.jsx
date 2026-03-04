@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useCallback, useEffect, useMemo } from 'react';
+import { createPortal } from 'react-dom';
 import { HiOutlineX, HiOutlineCalendar, HiOutlineClock } from 'react-icons/hi';
 import { submitBooking } from '@/lib/api';
 
@@ -66,13 +67,19 @@ export default function BookMeModal({ open, onClose, muse = {}, feesForTier = []
 
   useEffect(() => {
     if (open) {
+      const prevOverflow = document.body.style.overflow;
+      const prevPosition = document.body.style.position;
       document.body.style.overflow = 'hidden';
+      document.body.style.position = 'fixed';
+      document.body.style.width = '100%';
       const onEscape = (e) => {
         if (e.key === 'Escape') onClose();
       };
       window.addEventListener('keydown', onEscape);
       return () => {
-        document.body.style.overflow = '';
+        document.body.style.overflow = prevOverflow;
+        document.body.style.position = prevPosition;
+        document.body.style.width = '';
         window.removeEventListener('keydown', onEscape);
       };
     }
@@ -183,16 +190,17 @@ export default function BookMeModal({ open, onClose, muse = {}, feesForTier = []
 
   if (!open) return null;
 
-  return (
+  const modalContent = (
     <div
-      className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-noir/60"
+      className="fixed inset-0 z-[200] flex items-end sm:items-center justify-center p-0 sm:p-4 bg-noir/70 min-h-[100dvh] overflow-y-auto"
+      style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0 }}
       role="dialog"
       aria-modal="true"
       aria-label="Booking form"
       onClick={onClose}
     >
       <div
-        className="relative w-full max-w-lg rounded-sm border border-noir/20 bg-cream shadow-xl overflow-hidden"
+        className="relative w-full max-w-lg rounded-t-lg sm:rounded-sm border border-noir/20 border-b-0 sm:border-b bg-cream shadow-xl overflow-hidden max-h-[95dvh] sm:max-h-[90vh] flex flex-col"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
@@ -232,7 +240,7 @@ export default function BookMeModal({ open, onClose, muse = {}, feesForTier = []
           ))}
         </div>
 
-        <div className="px-6 py-6 min-h-[280px]">
+        <div className="px-6 py-6 min-h-[280px] overflow-y-auto flex-1">
           {/* Step 1 */}
           {step === 1 && (
             <div className="space-y-5">
@@ -493,4 +501,7 @@ export default function BookMeModal({ open, onClose, muse = {}, feesForTier = []
       </div>
     </div>
   );
+
+  if (typeof document === 'undefined') return null;
+  return createPortal(modalContent, document.body);
 }
