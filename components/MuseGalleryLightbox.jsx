@@ -1,15 +1,23 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import Link from 'next/link';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation, Keyboard } from 'swiper/modules';
 import { HiOutlineX } from 'react-icons/hi';
+import BookMeModal from '@/components/BookMeModal';
 import 'swiper/css';
 import 'swiper/css/navigation';
 
-export default function MuseGalleryLightbox({ mainImage, images = [], museName = '', tagline = '' }) {
+export default function MuseGalleryLightbox({
+  mainImage,
+  images = [],
+  museName = '',
+  tagline = '',
+  muse = {},
+  feesForTier = [],
+}) {
   const [open, setOpen] = useState(false);
+  const [bookingOpen, setBookingOpen] = useState(false);
   const [initialIndex, setInitialIndex] = useState(0);
   const list = images.length > 0 ? images : mainImage ? [mainImage] : [];
 
@@ -40,12 +48,19 @@ export default function MuseGalleryLightbox({ mainImage, images = [], museName =
             {museName?.charAt(0) ?? '?'}
           </div>
         </div>
-        <Link
-          href="/contact"
+        <button
+          type="button"
+          onClick={() => setBookingOpen(true)}
           className="block w-full text-center py-3.5 rounded-sm bg-noir text-cream text-sm font-medium tracking-[0.15em] uppercase hover:bg-noir/90 transition-colors"
         >
           Book me →
-        </Link>
+        </button>
+        <BookMeModal
+          open={bookingOpen}
+          onClose={() => setBookingOpen(false)}
+          muse={muse}
+          feesForTier={feesForTier}
+        />
       </div>
     );
   }
@@ -72,12 +87,19 @@ export default function MuseGalleryLightbox({ mainImage, images = [], museName =
             )}
           </div>
         </button>
-        <Link
-          href="/contact"
+        <button
+          type="button"
+          onClick={() => setBookingOpen(true)}
           className="block w-full text-center py-3.5 rounded-sm bg-noir text-cream text-sm font-medium tracking-[0.15em] uppercase hover:bg-noir/90 transition-colors"
         >
           Book me →
-        </Link>
+        </button>
+        <BookMeModal
+          open={bookingOpen}
+          onClose={() => setBookingOpen(false)}
+          muse={muse}
+          feesForTier={feesForTier}
+        />
         {list.length > 1 && (
           <div className="flex gap-2 overflow-x-auto pb-1 pt-2">
             {list.map((src, idx) => (

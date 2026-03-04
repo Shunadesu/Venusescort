@@ -1,6 +1,14 @@
-import { getContactChannels, getSite } from '@/lib/api';
+import { getContactChannels, getSite, getFees } from '@/lib/api';
 import ContactForm from '@/components/ContactForm';
 import ContactAccordion from '@/components/ContactAccordion';
+
+const TIER_LABELS = {
+  sweet: 'Sweet',
+  premium: 'Premium',
+  excellente: 'Excellente',
+  elite: 'Elite',
+};
+const TIER_KEYS = ['sweet', 'premium', 'excellente', 'elite'];
 
 export const metadata = {
   title: 'Contact — Venusescort',
@@ -23,7 +31,11 @@ const DEFAULT_ACCORDIONS = [
 ];
 
 export default async function ContactPage() {
-  const [channels, site] = await Promise.all([getContactChannels(), getSite()]);
+  const [channels, site, feeRows] = await Promise.all([
+    getContactChannels(),
+    getSite(),
+    getFees(),
+  ]);
   const visibleChannels = Array.isArray(channels) ? channels.filter((c) => c.visible !== false) : [];
   const intro = (site?.contactIntro || DEFAULT_INTRO).trim();
   const accordions =
@@ -31,6 +43,9 @@ export default async function ContactPage() {
       ? site.contactAccordions.filter((a) => a && (a.title || a.body))
       : DEFAULT_ACCORDIONS;
   const agencyHours = (site?.agencyHours || '').trim();
+  const feesTableRows = (Array.isArray(feeRows) ? feeRows : []).filter(
+    (r) => r && (r.label || r.durationKey)
+  );
 
   return (
     <div className="pt-14 min-h-screen bg-cream">
@@ -51,6 +66,55 @@ export default async function ContactPage() {
                 ))}
               </div>
               <ContactAccordion items={accordions} />
+
+              {/* Fees by tier */}
+              {feesTableRows.length > 0 && (
+                <div className="mt-10">
+                  <h2 className="text-xs font-semibold tracking-[0.2em] uppercase text-noir mb-4">
+                    Fees by tier
+                  </h2>
+                  <p className="text-[11px] text-noir/50 mb-2">Prices in €. Each muse is assigned one tier.</p>
+                  <div className="rounded-sm border border-noir/10 overflow-hidden">
+                    <table className="w-full text-sm">
+                      <thead>
+                        <tr className="border-b border-noir/10 bg-noir/[0.03]">
+                          <th className="px-4 py-3 text-left text-xs font-semibold text-noir/70 uppercase tracking-wider">
+                            Duration
+                          </th>
+                          {TIER_KEYS.map((key) => (
+                            <th
+                              key={key}
+                              className="px-4 py-3 text-right text-xs font-semibold text-noir/70 uppercase tracking-wider"
+                            >
+                              {TIER_LABELS[key]}
+                            </th>
+                          ))}
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-noir/10">
+                        {feesTableRows.map((row, i) => (
+                          <tr
+                            key={i}
+                            className={i % 2 === 0 ? 'bg-noir/[0.03]' : 'bg-cream'}
+                          >
+                            <td className="px-4 py-3 font-medium text-noir/60">
+                              {row.label || row.durationKey || '—'}
+                            </td>
+                            {TIER_KEYS.map((key) => (
+                              <td
+                                key={key}
+                                className="px-4 py-3 text-noir text-right tabular-nums"
+                              >
+                                {row[key] != null && row[key] > 0 ? `${row[key]} €` : '—'}
+                              </td>
+                            ))}
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* Right: Contact */}

@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { getMuseBySlug } from '@/lib/api';
+import { getMuseBySlug, getFees } from '@/lib/api';
 import MuseGalleryLightbox from '@/components/MuseGalleryLightbox';
 
 const PROFILE_LABELS = {
@@ -120,8 +120,16 @@ export async function generateMetadata({ params }) {
 }
 
 export default async function MuseDetailPage({ params }) {
-  const muse = await getMuseBySlug(params.slug);
+  const [muse, feeRows] = await Promise.all([
+    getMuseBySlug(params.slug),
+    getFees(),
+  ]);
   if (!muse) notFound();
+
+  const tier = ['sweet', 'premium', 'excellente', 'elite'].includes(muse.tier) ? muse.tier : 'sweet';
+  const feesForTier = (Array.isArray(feeRows) ? feeRows : [])
+    .filter((r) => r && (r.label || r.durationKey))
+    .map((r) => ({ label: r.label || r.durationKey, price: r[tier] ?? 0 }));
 
   const mainImage = toDisplayImageUrl(muse.imageUrl) || toDisplayImageUrl(muse.gallery?.[0]);
   const images = [
@@ -242,6 +250,53 @@ export default async function MuseDetailPage({ params }) {
                 </div>
               )}
 
+              {/* Fees: bảng giá theo tier của muse */}
+              <div>
+                <h2 className="text-xs font-semibold tracking-[0.2em] uppercase text-noir mb-4">
+                  Fees
+                </h2>
+                {feesForTier.length > 0 && (
+                  <p className="text-[11px] text-noir/50 capitalize mb-2">
+                    {tier} tier · prices in €
+                  </p>
+                )}
+                {feesForTier.length > 0 ? (
+                  <div className="rounded-sm border border-noir/10 overflow-hidden">
+                    <table className="w-full text-sm">
+                      <tbody className="divide-y divide-noir/10">
+                        <tr className="bg-noir/[0.03]">
+                          <td className="px-4 py-3 font-medium text-noir/60 w-[38%] align-top">
+                            Duration
+                          </td>
+                          <td className="px-4 py-3 text-noir text-right">
+                            Price
+                          </td>
+                        </tr>
+                        {feesForTier.map((row, i) => (
+                          <tr
+                            key={i}
+                            className={i % 2 === 0 ? 'bg-noir/[0.03]' : 'bg-cream'}
+                          >
+                            <td className="px-4 py-3 font-medium text-noir/60 w-[38%] align-top">
+                              {row.label}
+                            </td>
+                            <td className="px-4 py-3 text-noir text-right font-semibold tabular-nums">
+                              {row.price > 0 ? `${row.price} €` : '—'}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                ) : (
+                  <div className="rounded-sm border border-noir/10 overflow-hidden">
+                    <p className="px-4 py-6 text-sm text-noir/50 text-center bg-noir/[0.03]">
+                      Rates available on request. Contact us for this muse&apos;s fees.
+                    </p>
+                  </div>
+                )}
+              </div>
+
               {/* My Perfect Date: below preferences, in content flow */}
               <section
                 className="relative w-full min-h-[380px] sm:min-h-[420px] flex items-center justify-center py-12 sm:py-16 px-4 sm:px-6 rounded-sm overflow-hidden -mx-0 sm:-mx-2"
@@ -291,6 +346,8 @@ export default async function MuseDetailPage({ params }) {
                 images={images}
                 museName={muse.name}
                 tagline={tagline}
+                muse={{ id: muse._id, name: muse.name }}
+                feesForTier={feesForTier}
               />
             </aside>
           </div>
