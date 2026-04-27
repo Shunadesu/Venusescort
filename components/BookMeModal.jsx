@@ -4,6 +4,7 @@ import { useState, useCallback, useEffect, useMemo } from 'react';
 import { createPortal } from 'react-dom';
 import { HiOutlineX, HiOutlineCalendar, HiOutlineClock } from 'react-icons/hi';
 import { submitBooking } from '@/lib/api';
+import { sendBookingEmail } from '@/lib/emailjs';
 
 const MONTHS = [
   'January', 'February', 'March', 'April', 'May', 'June',
@@ -178,6 +179,19 @@ export default function BookMeModal({ open, onClose, muse = {}, feesForTier = []
         preferredContact: form.preferredContact,
       });
       setSuccess(true);
+      // Send notification email via EmailJS
+      sendBookingEmail({
+        museName: muse.name || '',
+        durationLabel: form.durationLabel,
+        date: form.date,
+        time: form.time,
+        price: form.price != null && form.price !== '' ? Number(form.price) : null,
+        firstName: form.firstName.trim(),
+        lastName: form.lastName.trim(),
+        email: form.email.trim(),
+        phone: form.phone?.trim() || '',
+        preferredContact: form.preferredContact,
+      });
       setTimeout(() => {
         onClose();
       }, 1500);

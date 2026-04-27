@@ -6,13 +6,6 @@ const nextConfig = {
       { protocol: 'http', hostname: 'localhost', pathname: '/**' },
     ],
   },
-  async rewrites() {
-    const backend = 'http://localhost:2802';
-    return [
-      { source: '/api/:path*', destination: `${backend}/api/:path*` },
-      { source: '/uploads/:path*', destination: `${backend}/uploads/:path*` },
-    ];
-  },
 };
 
 module.exports = nextConfig;

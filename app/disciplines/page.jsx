@@ -7,7 +7,8 @@ export const metadata = {
 };
 
 export default async function DisciplinesPage() {
-  const disciplines = await getDisciplines();
+  const rawDisciplines = await getDisciplines();
+  const disciplines = Array.isArray(rawDisciplines) ? rawDisciplines : rawDisciplines?.data ?? [];
 
   return (
     <div className="pt-14 min-h-screen">

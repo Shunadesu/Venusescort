@@ -15,11 +15,15 @@ const DISCIPLINE_INTROS = {
 };
 
 export default async function HomePage() {
-  const [site, muses, disciplines] = await Promise.all([
+  const [site, muses, disciplinesRaw] = await Promise.all([
     getSite(),
     getMuses(),
     getDisciplines(),
   ]);
+
+  const disciplines = Array.isArray(disciplinesRaw)
+    ? disciplinesRaw
+    : disciplinesRaw?.data ?? [];
 
   const brandName = site?.brandName || 'Venusescort';
   const slogan = site?.slogan || 'A standards-based collective of untamed muses.';
@@ -29,7 +33,7 @@ export default async function HomePage() {
 
   return (
     <div>
-      {/* Hero — full viewport, brand center, tagline bottom-right */}
+      {/* Hero */}
       <section className="relative min-h-screen flex flex-col items-center justify-center px-4">
         <div className="absolute inset-0 z-0">
           <Image
@@ -43,7 +47,7 @@ export default async function HomePage() {
           <div className="absolute inset-0 bg-noir/40" />
         </div>
         <div className="relative z-10 w-full max-w-[1600px] mx-auto min-h-screen flex flex-col items-center justify-center">
-          <h1 className="font-serif text-5xl sm:text-7xl md:text-8xl  text-shiny text-center">
+          <h1 className="font-serif text-5xl sm:text-7xl md:text-8xl text-shiny text-center">
             {brandName.toUpperCase()}
           </h1>
           <p className="absolute bottom-8 left-8 text-cream/90 text-sm max-w-xs text-left tracking-wide">
@@ -52,11 +56,10 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* Disciplines — 100vh, centered V layout, shiny gradient text */}
+      {/* Disciplines */}
       <section className="relative min-h-screen flex items-center justify-center py-16 bg-gradient-to-br from-noir via-[#1a1812] to-noir">
         <div className="max-w-[1600px] mx-auto w-full px-6 sm:px-12 md:px-16 h-full flex items-center">
           <div className="grid grid-cols-1 md:grid-cols-3 md:grid-rows-[1fr_1fr] gap-y-16 md:gap-y-20 gap-x-8 items-center w-full min-h-[55vh] md:min-h-[70vh]">
-            {/* Row 1: KINK left, empty, FEMME right */}
             <div className="md:justify-self-start text-center md:text-left order-1 flex flex-col justify-center min-h-[140px] md:min-h-[180px]">
               {(() => {
                 const bySlug = Object.fromEntries(disciplines.map((d) => [d.slug, d]));
@@ -90,7 +93,6 @@ export default async function HomePage() {
                 );
               })()}
             </div>
-            {/* Row 2: empty, SOMATICS center, empty */}
             <div className="hidden md:block order-4" />
             <div className="flex flex-col justify-center items-center order-5 md:col-start-2 md:row-start-2 min-h-[140px] md:min-h-[180px]">
               {(() => {
@@ -113,10 +115,10 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* Muses — tabs + Swiper carousel */}
-      <MusesSection muses={muses} disciplines={disciplines} />
+      {/* Muses - All muses displayed */}
+      <MusesSection muses={muses} />
 
-      {/* Manifesto — quote + CTA */}
+      {/* Manifesto */}
       <section className="relative py-24 md:py-28 px-4 bg-cream-dark overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-b from-cream/30 via-transparent to-cream/20 pointer-events-none" />
         <div className="relative max-w-[1600px] mx-auto">
@@ -142,7 +144,7 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* Contact — mirroring Contact page behaviour */}
+      {/* Contact */}
       <section className="py-16 px-4 bg-noir text-cream border-t border-cream/10">
         <ContactSection />
       </section>

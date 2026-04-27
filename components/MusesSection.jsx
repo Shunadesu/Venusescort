@@ -1,198 +1,104 @@
 'use client';
 
-import { useState, useMemo, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { Swiper, SwiperSlide } from 'swiper/react';
-import { Navigation } from 'swiper/modules';
-import { HiOutlineChevronLeft, HiOutlineChevronRight } from 'react-icons/hi';
+import { motion } from 'framer-motion';
 import { isValidImageUrl } from '@/lib/image';
-import 'swiper/css';
-import 'swiper/css/navigation';
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || '/api';
 const UPLOADS_BASE = API_BASE.replace(/\/api\/?$/, '');
 
-const TABS = [
-  { slug: 'kink', label: 'KINK' },
-  { slug: 'somatics', label: 'SOMATICS' },
-  { slug: 'femme', label: 'FEMME' },
-];
-
-function hasDiscipline(muse, slug) {
-  const disciplines = muse.disciplines || [];
-  return disciplines.some((d) => (typeof d === 'object' ? d.slug : d) === slug);
+function resolveImageUrl(raw) {
+  if (!raw) return null;
+  if (raw.startsWith('/')) return `${UPLOADS_BASE}${raw}`;
+  if (isValidImageUrl(raw)) return raw;
+  return null;
 }
 
-function MuseSlide({ muse }) {
-  const rawImages = useMemo(() => {
-    const raws = [
-      muse.imageUrl,
-      ...(Array.isArray(muse.gallery) ? muse.gallery : []),
-    ].filter(Boolean);
-    // remove duplicates
-    return Array.from(new Set(raws));
-  }, [muse.imageUrl, muse.gallery]);
+const cardVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: (i) => ({
+    opacity: 1,
+    y: 0,
+    transition: {
+      delay: i * 0.08,
+      duration: 0.5,
+      ease: [0.25, 0.46, 0.45, 0.94],
+    },
+  }),
+};
 
-  const [index, setIndex] = useState(0);
-
-  // Reset index when muse or gallery length changes
-  useEffect(() => {
-    setIndex(0);
-  }, [muse._id, rawImages.length]);
-
-  // Auto-rotate every 3s when there is more than one image
-  useEffect(() => {
-    if (rawImages.length <= 1) return undefined;
-    const id = setInterval(() => {
-      setIndex((prev) => (prev + 1) % rawImages.length);
-    }, 3000);
-    return () => clearInterval(id);
-  }, [rawImages.length]);
-
-  const currentRaw = rawImages[index] || '';
-  let displaySrc = '';
-  let useNextImage = false;
-
-  if (currentRaw) {
-    if (currentRaw.startsWith('/')) {
-      displaySrc = `${UPLOADS_BASE}${currentRaw}`;
-      useNextImage = false;
-    } else if (isValidImageUrl(currentRaw)) {
-      displaySrc = currentRaw;
-      useNextImage = true;
-    }
-  }
-
-  const hasImage = !!displaySrc;
+function MuseCard({ muse, index }) {
+  const imageSrc = resolveImageUrl(muse.imageUrl);
 
   return (
-    <Link href={`/muses/${muse.slug}`} className="group block">
-      <div className="aspect-[4/5] max-h-[280px] sm:max-h-[320px] md:max-h-[360px] relative bg-noir/5 overflow-hidden rounded-sm shadow-[0_4px_24px_-4px_rgba(0,0,0,0.08)] group-hover:shadow-[0_12px_40px_-8px_rgba(0,0,0,0.12)] transition-shadow duration-300">
-        {hasImage ? (
-          useNextImage ? (
+    <motion.div
+      custom={index}
+      variants={cardVariants}
+      initial="hidden"
+      animate="visible"
+      className="group"
+    >
+      <Link href={`/muses/${muse.slug}`}>
+        <div className="relative aspect-[4/5] overflow-hidden rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 ease-out bg-noir/5">
+          {imageSrc ? (
             <Image
-              src={displaySrc}
+              src={imageSrc}
               alt={muse.name}
               fill
-              className="object-cover group-hover:scale-105 transition-transform duration-500"
-              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+              className="object-cover group-hover:scale-110 transition-transform duration-700 ease-out"
+              sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
             />
           ) : (
-            <img
-              src={displaySrc}
-              alt={muse.name}
-              className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-            />
-          )
-        ) : (
-          <div className="w-full h-full flex items-center justify-center text-cream/40 font-serif text-4xl">
-            {muse.name.charAt(0)}
-          </div>
-        )}
-        {/* Overlay: tên + mô tả nằm trong khung hình */}
-        <div className="absolute inset-x-0 bottom-0 pt-16 pb-4 px-4 bg-gradient-to-t from-noir/85 via-noir/40 to-transparent flex flex-col justify-end rounded-b-sm">
-          <p className="font-serif text-lg sm:text-xl tracking-wide text-white drop-shadow-sm">
-            {(muse.name || '').toUpperCase()}
-          </p>
-          {muse.title && (
-            <p className="text-xs sm:text-sm text-white/90 tracking-[0.02em] mt-0.5 line-clamp-2">
-              {muse.title}
-            </p>
+            <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-noir/10 to-noir/5 text-noir/25 font-serif text-6xl">
+              {muse.name?.charAt(0) || '?'}
+            </div>
           )}
+          <div className="absolute inset-0 bg-gradient-to-t from-noir/90 via-noir/30/50 to-transparent opacity-60 group-hover:opacity-80 transition-opacity duration-300" />
+          <div className="absolute bottom-0 left-0 right-0 p-5 sm:p-6">
+            <h3 className="font-serif text-white text-lg sm:text-xl tracking-wide drop-shadow-md">
+              {(muse.name || '').toUpperCase()}
+            </h3>
+            {muse.title && (
+              <p className="text-white/75 text-xs sm:text-sm mt-1.5 line-clamp-2">
+                {muse.title}
+              </p>
+            )}
+          </div>
         </div>
-      </div>
-    </Link>
+      </Link>
+    </motion.div>
   );
 }
 
-export default function MusesSection({ muses = [], disciplines = [] }) {
-  const [activeTab, setActiveTab] = useState('kink');
-
-  const filteredMuses = useMemo(() => {
-    return muses.filter((m) => hasDiscipline(m, activeTab));
-  }, [muses, activeTab]);
+export default function MusesSection({ muses: rawMuses = [] }) {
+  const muses = Array.isArray(rawMuses) ? rawMuses : [];
 
   return (
-    <section className="min-h-screen flex flex-col py-20 md:py-24 px-6 sm:px-8 md:px-12 bg-gradient-to-b from-cream via-cream to-cream-dark/95">
-      {/* Title — refined, luxurious */}
-      <div className="flex-1 flex flex-col items-center justify-center min-h-[20vh]">
+    <section className="min-h-screen flex flex-col py-16 md:py-24 px-4 sm:px-8 md:px-12 lg:px-16 bg-gradient-to-b from-cream via-cream to-cream-dark/95">
+      <div className="flex-1 flex flex-col items-center justify-center min-h-[15vh]">
         <h2 className="font-serif text-4xl sm:text-5xl md:text-6xl lg:text-7xl text-noir text-center tracking-[0.35em] font-light">
           MUSES
         </h2>
         <span className="mt-4 block w-12 h-px bg-noir/40" aria-hidden />
       </div>
 
-      {/* Tabs */}
-      <div className="flex justify-center gap-10 sm:gap-14 mb-12">
-        {TABS.map(({ slug, label }) => (
-          <button
-            key={slug}
-            type="button"
-            suppressHydrationWarning
-            onClick={() => setActiveTab(slug)}
-            className={`text-xs sm:text-sm tracking-[0.3em] uppercase transition-all duration-300 ${
-              activeTab === slug
-                ? 'text-noir font-medium border-b border-noir/90 pb-2'
-                : 'text-noir/40 hover:text-noir/70'
-            }`}
+      <div className="max-w-[1600px] mx-auto w-full mt-10">
+        {muses.length > 0 ? (
+          <motion.div
+            className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-5 sm:gap-6 md:gap-8"
+            initial="hidden"
+            animate="visible"
           >
-            {label}
-          </button>
-        ))}
-      </div>
-
-      {/* Swiper carousel */}
-      <div className="max-w-[1600px] mx-auto w-full">
-        <div className="relative">
-          <Swiper
-            key={activeTab}
-            modules={[Navigation]}
-            spaceBetween={16}
-            slidesPerView={2}
-            breakpoints={{
-              640: { slidesPerView: 3, spaceBetween: 20 },
-              1024: { slidesPerView: 4, spaceBetween: 24 },
-            }}
-            navigation={{
-              prevEl: '.muses-prev',
-              nextEl: '.muses-next',
-            }}
-            className="!overflow-visible"
-          >
-            {filteredMuses.length > 0 ? (
-              filteredMuses.map((m) => (
-                <SwiperSlide key={m._id}>
-                  <MuseSlide muse={m} />
-                </SwiperSlide>
-              ))
-            ) : (
-              <SwiperSlide>
-                <div className="aspect-[4/5] max-h-[280px] sm:max-h-[320px] md:max-h-[360px] flex items-center justify-center bg-noir/5 rounded-sm text-noir/50 font-serif text-sm">
-                  No muses in this discipline yet.
-                </div>
-              </SwiperSlide>
-            )}
-          </Swiper>
-
-          {/* Custom nav arrows */}
-          <button
-            type="button"
-            suppressHydrationWarning
-            className="muses-prev absolute left-0 top-1/2 -translate-y-1/2 -translate-x-2 md:-translate-x-4 z-10 w-11 h-11 rounded-full bg-noir/90 text-cream/95 flex items-center justify-center hover:bg-noir hover:text-cream transition-all duration-300 shadow-lg disabled:opacity-30 disabled:pointer-events-none"
-            aria-label="Previous"
-          >
-            <HiOutlineChevronLeft className="w-5 h-5" />
-          </button>
-          <button
-            type="button"
-            suppressHydrationWarning
-            className="muses-next absolute right-0 top-1/2 -translate-y-1/2 translate-x-2 md:translate-x-4 z-10 w-11 h-11 rounded-full bg-noir/90 text-cream/95 flex items-center justify-center hover:bg-noir hover:text-cream transition-all duration-300 shadow-lg disabled:opacity-30 disabled:pointer-events-none"
-            aria-label="Next"
-          >
-            <HiOutlineChevronRight className="w-5 h-5" />
-          </button>
-        </div>
+            {muses.map((m, i) => (
+              <MuseCard key={m._id} muse={m} index={i} />
+            ))}
+          </motion.div>
+        ) : (
+          <div className="py-20 text-center text-noir/50 font-serif text-sm">
+            No muses available yet.
+          </div>
+        )}
       </div>
     </section>
   );

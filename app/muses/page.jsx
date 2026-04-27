@@ -8,6 +8,5 @@ export const metadata = {
 
 export default async function MusesPage() {
   const muses = await getMuses();
-
   return <MusesListSection muses={muses} />;
 }
