@@ -22,7 +22,7 @@ export default function MuseGallery({ name, images = [] }) {
         <img
           src={current}
           alt={name}
-          className="w-full h-full object-cover"
+          className="w-full h-full object-contain"
         />
       </div>
 
@@ -33,13 +33,13 @@ export default function MuseGallery({ name, images = [] }) {
               key={idx}
               type="button"
               onClick={() => setActiveIndex(idx)}
-              className={`relative w-16 h-20 rounded-sm overflow-hidden border transition-all duration-200 ${
+              className={`relative w-16 h-20 rounded-sm overflow-hidden border transition-all duration-200 flex-shrink-0 ${
                 idx === activeIndex
                   ? 'border-noir shadow-[0_0_0_1px_rgba(0,0,0,0.6)]'
                   : 'border-noir/10 hover:border-noir/40'
               }`}
             >
-              <img src={src} alt={`${name} ${idx + 1}`} className="w-full h-full object-cover" />
+              <img src={src} alt={`${name} ${idx + 1}`} className="w-full h-full object-contain" />
             </button>
           ))}
         </div>
@@ -47,4 +47,3 @@ export default function MuseGallery({ name, images = [] }) {
     </div>
   );
 }
-

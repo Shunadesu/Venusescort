@@ -43,8 +43,8 @@ export default function MuseGalleryLightbox({
   if (list.length === 0) {
     return (
       <div className="sticky top-24 space-y-4">
-        <div className="relative aspect-[3/4] max-h-[75vh] rounded-sm overflow-hidden bg-noir shadow-[0_8px_40px_-10px_rgba(0,0,0,0.25)]">
-          <div className="absolute inset-0 flex items-center justify-center text-cream/30 font-serif text-5xl">
+        <div className="relative aspect-[3/4] max-h-[75vh] rounded-sm overflow-hidden bg-noir shadow-[0_8px_40px_-10px_rgba(0,0,0,0.25)] flex items-center justify-center">
+          <div className="text-cream/30 font-serif text-5xl">
             {museName?.charAt(0) ?? '?'}
           </div>
         </div>
@@ -71,12 +71,12 @@ export default function MuseGalleryLightbox({
         <button
           type="button"
           onClick={() => openAt(0)}
-          className="relative aspect-[3/4] max-h-[75vh] w-full rounded-sm overflow-hidden bg-noir shadow-[0_8px_40px_-10px_rgba(0,0,0,0.25)] text-left block group"
+          className="relative aspect-[3/4] max-h-[75vh] w-full rounded-sm overflow-hidden bg-noir shadow-[0_8px_40px_-10px_rgba(0,0,0,0.25)] flex items-center justify-center group"
         >
           <img
             src={mainImage || list[0]}
             alt={museName}
-            className="w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-500"
+            className="max-w-full max-h-full object-contain"
           />
           <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-noir/90 via-noir/30 to-transparent p-5 pt-16">
             <p className="text-cream font-serif font-bold text-2xl uppercase tracking-wide">
@@ -107,12 +107,12 @@ export default function MuseGalleryLightbox({
                 key={idx}
                 type="button"
                 onClick={() => openAt(idx)}
-                className="relative w-14 h-20 rounded-sm overflow-hidden border border-noir/15 hover:border-noir/40 flex-shrink-0 focus:outline-none focus:ring-2 focus:ring-noir/50"
+                className="relative w-14 h-20 rounded-sm overflow-hidden border border-noir/15 hover:border-noir/40 flex-shrink-0 focus:outline-none focus:ring-2 focus:ring-noir/50 flex items-center justify-center bg-noir/20"
               >
                 <img
                   src={src}
                   alt={`${museName} ${idx + 1}`}
-                  className="w-full h-full object-cover"
+                  className="max-w-full max-h-full object-contain"
                 />
               </button>
             ))}
@@ -155,11 +155,13 @@ export default function MuseGalleryLightbox({
             >
               {list.map((src, idx) => (
                 <SwiperSlide key={idx} className="flex items-center justify-center">
-                  <img
-                    src={src}
-                    alt={`${museName} ${idx + 1}`}
-                    className="max-w-full max-h-[85vh] w-auto h-auto object-contain"
-                  />
+                  <div className="max-w-full max-h-[85vh] w-full object-contain">
+                    <img
+                      src={src}
+                      alt={`${museName} ${idx + 1}`}
+                      className="max-w-full max-h-[85vh] w-full h-full object-contain object-center"
+                    />
+                  </div>
                 </SwiperSlide>
               ))}
             </Swiper>
